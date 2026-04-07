@@ -56,7 +56,7 @@ async function uploadProfilePic(req, res) {
         const storageService = require('../services/storage.service');
         const { v4: uuid } = require("uuid");
         
-        const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid());
+        const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid(), "image");
 
         const updatedPartner = await foodPartnerModel.findByIdAndUpdate(
             foodPartnerId,

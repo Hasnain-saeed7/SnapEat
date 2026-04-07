@@ -45,7 +45,7 @@ cloudinary.config({
 /**
  * @param {Buffer} fileBuffer - The file buffer from multer
  * @param {String} fileName - Original file name or UUID
- * @param {String} type - 'video' or 'audio' (default is video)
+ * @param {String} type - 'video', 'audio', or 'image' (default is video)
  */
 const uploadFile = (fileBuffer, fileName, type = "video") => {
   return new Promise((resolve, reject) => {
@@ -59,16 +59,21 @@ const uploadFile = (fileBuffer, fileName, type = "video") => {
 
     // 2. Setup Cloudinary Options
     const uploadOptions = {
-      resource_type: "video", // Cloudinary uses "video" for both video and audio
-      folder: type === "audio" ? "SnapEat_Voices" : "SnapEat_Reels",
+      folder: type === "audio" ? "SnapEat_Voices" : type === "image" ? "SnapEat_Images" : "SnapEat_Reels",
       public_id: fileName.split('.')[0],
     };
+
+    // Set resource type based on file type
+    if (type === "image") {
+      uploadOptions.resource_type = "image";
+    } else {
+      uploadOptions.resource_type = "video"; // Cloudinary uses "video" for both video and audio
+    }
 
     // For audio files, force MP3 conversion for maximum browser compatibility
     if (type === "audio") {
       uploadOptions.format = "mp3";
-      uploadOptions.resource_type = "video"; // Keep as video (Cloudinary handles audio under video)
-    } else {
+    } else if (type === "video") {
       // For video files, apply quality optimization
       uploadOptions.transformation = [
         { quality: "auto:low" },
@@ -97,7 +102,8 @@ const uploadFile = (fileBuffer, fileName, type = "video") => {
         console.log('📊 Format:', result.format);
         console.log('🎵 Resource type:', result.resource_type);
         
-        resolve(result.secure_url);
+        // Return an object with url property for compatibility
+        resolve({ url: result.secure_url, ...result });
       }
     );
 

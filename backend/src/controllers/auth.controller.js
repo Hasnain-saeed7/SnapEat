@@ -77,7 +77,7 @@ async function registerUser(req, res) {
     // Upload profile picture if provided
     if (req.file) {
         try {
-            const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid());
+            const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid(), "image");
             profilePicUrl = fileUploadResult.url;
         } catch (err) {
             console.error("Error uploading profile picture:", err);
