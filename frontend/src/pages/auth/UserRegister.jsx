@@ -112,9 +112,7 @@ const UserRegister = () => {
       formData.append('password', pwd);
       if (profilePic) formData.append('profilePic', profilePic);
 
-      const response = await API.post("/api/auth/user/register", formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await API.post("/api/auth/user/register", formData);
       console.log(response.data);
       navigate("/user/login");
     } catch (err) {

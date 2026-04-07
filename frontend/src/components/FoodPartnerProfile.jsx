@@ -57,9 +57,7 @@ const FoodPartnerProfile = () => {
     const formData = new FormData();
     formData.append('profilePic', file);
     try {
-      await API.post(`/api/food-partner/${id}/profile-pic`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await API.post(`/api/food-partner/${id}/profile-pic`, formData);
     } catch (error) {
       console.error('Failed to upload profile picture:', error);
     }

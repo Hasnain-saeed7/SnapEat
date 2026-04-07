@@ -159,9 +159,7 @@ const Messages = () => {
         ? `/api/messages/partner/${conversationId}/voice`
         : `/api/messages/user/${conversationId}/voice`;
 
-      const res = await API.post(endpoint, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await API.post(endpoint, formData);
 
       setMessages(prev => [...prev, res.data.message]);
       setAudioChunks([]);
