@@ -178,8 +178,7 @@ const FoodPartnerRegister = () => {
         category: resolvedCategory
       })
         .then(res => {
-          const partnerId = res.data.foodPartner._id;
-          navigate(`/food-partner/profile/${partnerId}`);
+          navigate('/food-partner/login');
         })
         .catch(err => {
           const errorMsg = err.response?.data?.message || "Registration failed. Please try again.";
