@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../../api/axios';
 import { AlertCircle } from 'lucide-react';
 import { validateEmail, validatePassword } from '../../utils/validations';
 
@@ -33,10 +33,10 @@ const UserLogin = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/user/login", {
+      const response = await API.post("/api/auth/user/login", {
         email,
         password
-      }, { withCredentials: true });
+      });
       console.log(response.data);
       localStorage.setItem('role', 'user');
       navigate("/home");

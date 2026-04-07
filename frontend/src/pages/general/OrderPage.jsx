@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../../api/axios';
 import {
   ArrowLeft, ShoppingCart, MapPin, CreditCard,
   Truck, Plus, Minus, Trash2, CheckCircle, Clock, X, Building2, Wallet, Smartphone
@@ -108,12 +108,12 @@ const OrderPage = () => {
     }
     setIsPlacingOrder(true);
     try {
-      const res = await axios.post('http://localhost:3000/api/order', {
+      const res = await API.post('/api/order', {
         items: cart.map(i => ({ foodId: i.foodId, quantity: i.quantity })),
         deliveryMethod,
         deliveryAddress: deliveryMethod === 'delivery' ? address : null,
         paymentMethod
-      }, { withCredentials: true });
+      });
       setOrderDetails(res.data.order);
       setOrderSuccess(true);
       clearCart();

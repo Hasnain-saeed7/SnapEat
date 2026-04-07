@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import API from '../../api/axios';
 import { Mail, Lock, MapPin, Briefcase, ChefHat, Phone, AlertCircle, CheckCircle } from 'lucide-react';
 import { validateEmail, validatePassword, validatePasswordMatch, validateName, validatePhone, validateAddress, getPasswordStrengthLabel, getPasswordStrengthColor, validatePasswordStrength } from '../../utils/validations';
 
@@ -71,7 +71,7 @@ const FoodPartnerRegister = () => {
       if (emailErrors.length === 0) {
         setEmailCheckLoading(true);
         try {
-          const response = await axios.post("http://localhost:3000/api/auth/check-email", { email });
+          const response = await API.post("/api/auth/check-email", { email });
           setEmailExists(response.data.exists);
           if (response.data.exists) {
             setErrors(prev => ({ ...prev, email: ['This email is already registered'] }));
@@ -149,14 +149,14 @@ const FoodPartnerRegister = () => {
     
     if (isEdit) {
       // Update existing partner
-      axios.put(`http://localhost:3000/api/food-partner/${partnerData._id}`, {
+      API.put(`/api/food-partner/${partnerData._id}`, {
         name: formData.businessName,
         contactName: formData.contactName,
         phone: formData.phone,
         email: formData.email,
         address: formData.address,
         category: resolvedCategory
-      }, { withCredentials: true })
+      })
         .then(() => {
        
           navigate(`/food-partner/profile/${partnerData._id}`);
@@ -168,7 +168,7 @@ const FoodPartnerRegister = () => {
         });
     } else {
       // Register new partner
-      axios.post("http://localhost:3000/api/auth/food-partner/register", {
+      API.post("/api/auth/food-partner/register", {
         name: formData.businessName,
         contactName: formData.contactName,
         phone: formData.phone,
@@ -176,7 +176,7 @@ const FoodPartnerRegister = () => {
         password: formData.password,
         address: formData.address,
         category: resolvedCategory
-      }, { withCredentials: true })
+      })
         .then(res => {
           const partnerId = res.data.foodPartner._id;
           navigate(`/food-partner/profile/${partnerId}`);

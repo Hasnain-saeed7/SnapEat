@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageCircle } from 'lucide-react';
-import axios from 'axios';
+import API from '../../api/axios';
 import BottomNav from '../../components/BottomNav';
 
 const ConversationsList = () => {
@@ -22,10 +22,10 @@ const ConversationsList = () => {
   const fetchConversations = async () => {
     try {
       const endpoint = isPartner
-        ? 'http://localhost:3000/api/messages/partner/conversations'
-        : 'http://localhost:3000/api/messages/user/conversations';
+        ? '/api/messages/partner/conversations'
+        : '/api/messages/user/conversations';
 
-      const res = await axios.get(endpoint, { withCredentials: true });
+      const res = await API.get(endpoint);
       setConversations(res.data.conversations);
     } catch (error) {
       console.error('Failed to fetch conversations:', error);

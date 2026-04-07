@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../../api/axios';
 import { Camera, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { validateEmail, validatePassword, validatePasswordMatch, validateName, getPasswordStrengthLabel, getPasswordStrengthColor, validatePasswordStrength } from '../../utils/validations';
 
@@ -34,7 +34,7 @@ const UserRegister = () => {
         // Check if email exists
         setEmailCheckLoading(true);
         try {
-          const response = await axios.post("http://localhost:3000/api/auth/check-email", { email });
+          const response = await API.post("/api/auth/check-email", { email });
           setEmailExists(response.data.exists);
           if (response.data.exists) {
             setErrors(prev => ({ ...prev, email: ['This email is already registered'] }));
@@ -112,8 +112,7 @@ const UserRegister = () => {
       formData.append('password', pwd);
       if (profilePic) formData.append('profilePic', profilePic);
 
-      const response = await axios.post("http://localhost:3000/api/auth/user/register", formData, {
-        withCredentials: true,
+      const response = await API.post("/api/auth/user/register", formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       console.log(response.data);

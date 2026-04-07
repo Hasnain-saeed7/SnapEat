@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../../api/axios';
 import { ArrowLeft, Plus, Minus, ShoppingCart, IndianRupee } from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
 
@@ -50,7 +50,7 @@ const PartnerMenu = () => {
     setLoading(true);
     setError('');
 
-    axios.get(`http://localhost:3000/api/food-partner/${id}`, { withCredentials: true })
+    API.get(`/api/food-partner/${id}`)
       .then((res) => {
         setPartner(res.data.foodPartner);
         setFoodItems(res.data.foodPartner?.foodItems ?? []);

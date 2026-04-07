@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Plus, Play, Star, UserPlus, UserCheck, Camera, Video, Trash2, MapPin, Phone, Edit3 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/axios';
 import BottomNav from './BottomNav';
 
 const FoodPartnerProfile = () => {
@@ -28,8 +28,8 @@ const FoodPartnerProfile = () => {
     if (!id) return;
     setLoading(true);
     setError('');
-    axios
-      .get(`http://localhost:3000/api/food-partner/${id}`, { withCredentials: true })
+    API
+      .get(`/api/food-partner/${id}`)
       .then((res) => {
         setPartner(res.data.foodPartner);
         setLocalVideos(res.data.foodPartner?.foodItems ?? []);
@@ -57,8 +57,7 @@ const FoodPartnerProfile = () => {
     const formData = new FormData();
     formData.append('profilePic', file);
     try {
-      await axios.post(`http://localhost:3000/api/food-partner/${id}/profile-pic`, formData, {
-        withCredentials: true,
+      await API.post(`/api/food-partner/${id}/profile-pic`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
     } catch (error) {
@@ -70,7 +69,7 @@ const FoodPartnerProfile = () => {
     if (followLoading) return;
     setFollowLoading(true);
     try {
-      const res = await axios.post(`http://localhost:3000/api/food-partner/${id}/follow`, {}, { withCredentials: true });
+      const res = await API.post(`/api/food-partner/${id}/follow`, {});
       setFollowing(res.data.isFollowing);
       setFollowers(res.data.followersCount);
     } catch (err) {
@@ -86,7 +85,7 @@ const FoodPartnerProfile = () => {
     if (deletingId) return;
     setDeletingId(videoId);
     try {
-      await axios.delete(`http://localhost:3000/api/food/${videoId}`, { withCredentials: true });
+      await API.delete(`/api/food/${videoId}`);
       setLocalVideos(prev => prev.filter(v => v._id !== videoId));
     } catch (err) {
       console.error('Failed to delete video:', err);
@@ -268,7 +267,7 @@ const FoodPartnerProfile = () => {
           <button
             onClick={async () => {
               try {
-                const res = await axios.post(`http://localhost:3000/api/messages/user/conversation/${id}`, {}, { withCredentials: true });
+                const res = await API.post(`/api/messages/user/conversation/${id}`, {});
                 navigate(`/messages/${res.data.conversation._id}`, {
                   state: { partner: { _id: id, name: partner?.name, profilePic, category } }
                 });

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
+import API from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { Upload, X, Film, ArrowLeft, Sparkles, IndianRupee } from 'lucide-react';
 
@@ -57,7 +57,7 @@ const CreateFood = () => {
       formData.append('name', name);
       formData.append('price', price);
       formData.append('mama', videoFile);
-      const response = await axios.post('http://localhost:3000/api/food', formData, { withCredentials: true });
+      const response = await API.post('/api/food', formData);
       const partnerId = response.data.food?.foodPartner?._id || response.data.food?.foodPartner;
       navigate(partnerId ? `/food-partner/profile/${partnerId}` : '/');
     } catch (error) {

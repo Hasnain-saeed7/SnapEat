@@ -486,7 +486,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import API from '../api/axios'
 
 const ReelFeed = ({ items = [], onLike, onSave, onCommentAdded, onCommentDeleted, currentUser, emptyMessage = 'No videos yet.' }) => {
   const videoRefs = useRef(new Map())
@@ -528,7 +528,7 @@ const ReelFeed = ({ items = [], onLike, onSave, onCommentAdded, onCommentDeleted
     setActiveFood(foodId)
     setLoadingComments(true)
     try {
-      const res = await axios.get(`http://localhost:3000/api/food/comments?foodId=${foodId}`, { withCredentials: true })
+      const res = await API.get(`/api/food/comments?foodId=${foodId}`)
       setCommentsCache(prev => ({ ...prev, [foodId]: res.data.comments || [] }))
     } catch (e) { console.error(e) }
     finally { setLoadingComments(false) }

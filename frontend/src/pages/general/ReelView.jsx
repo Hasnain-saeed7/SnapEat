@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
-import axios from 'axios';
+import API from '../../api/axios';
 
 const ReelView = () => {
   const location = useLocation();
@@ -85,9 +85,8 @@ const ReelView = () => {
   // Like handler
   const handleLike = async (item) => {
     try {
-      const res = await axios.post('http://localhost:3000/api/food/like', 
-        { foodId: item._id }, 
-        { withCredentials: true }
+      const res = await API.post('/api/food/like', 
+        { foodId: item._id }
       );
       setItems(prev => prev.map(v => 
         v._id === item._id 
@@ -102,9 +101,8 @@ const ReelView = () => {
   // Save handler
   const handleSave = async (item) => {
     try {
-      const res = await axios.post('http://localhost:3000/api/food/save',
-        { foodId: item._id },
-        { withCredentials: true }
+      const res = await API.post('/api/food/save',
+        { foodId: item._id }
       );
       setItems(prev => prev.map(v =>
         v._id === item._id
@@ -122,9 +120,7 @@ const ReelView = () => {
     setCommentText('');
     setLoadingComments(true);
     try {
-      const res = await axios.get(`http://localhost:3000/api/food/comments?foodId=${foodId}`, {
-        withCredentials: true
-      });
+      const res = await API.get(`/api/food/comments?foodId=${foodId}`);
       setCommentsCache(prev => ({ ...prev, [foodId]: res.data.comments || [] }));
     } catch (e) {
       console.error('Failed to load comments', e);
@@ -144,10 +140,10 @@ const ReelView = () => {
     if (!commentText.trim() || posting) return;
     setPosting(true);
     try {
-      const res = await axios.post('http://localhost:3000/api/food/comment', {
+      const res = await API.post('/api/food/comment', {
         foodId: activeFood,
         comment: commentText.trim()
-      }, { withCredentials: true });
+      });
       setCommentsCache(prev => ({
         ...prev,
         [activeFood]: [...(prev[activeFood] || []), res.data.comment]

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
+import API from '../../api/axios';
 import '../../styles/reels.css'
 import ReelFeed from '../../components/ReelFeed'
  
@@ -14,7 +14,7 @@ const Home = () => {
     useEffect(() => {
         // Fetch current user data (only for regular users, partners can skip this)
         if (role === 'user') {
-            axios.get("http://localhost:3000/api/auth/user/me", { withCredentials: true })
+            API.get("/api/auth/user/me")
                 .then(response => {
 
                     setCurrentUser(response.data.user)
@@ -25,7 +25,7 @@ const Home = () => {
         }
         
         // Fetch videos - works for both users and partners now
-        axios.get("http://localhost:3000/api/food", { withCredentials: true })
+        API.get("/api/food")
             .then(response => {
                 setVideos(response.data.foodItems)
             })
@@ -33,7 +33,7 @@ const Home = () => {
     }, [role])
 
     async function likeVideo(item) {
-        const response = await axios.post("http://localhost:3000/api/food/like", { foodId: item._id }, { withCredentials: true })
+        const response = await API.post("/api/food/like", { foodId: item._id })
         if (response.data.like) {
             setVideos((prev) => prev.map((v) => v._id === item._id ? { ...v, likeCount: v.likeCount + 1 } : v))
         } else {
@@ -42,7 +42,7 @@ const Home = () => {
     }
 
     async function saveVideo(item) {
-        const response = await axios.post("http://localhost:3000/api/food/save", { foodId: item._id }, { withCredentials: true })
+        const response = await API.post("/api/food/save", { foodId: item._id })
         if (response.data.save) {
             setVideos((prev) => prev.map((v) => v._id === item._id ? { ...v, savesCount: v.savesCount + 1 } : v))
         } else {

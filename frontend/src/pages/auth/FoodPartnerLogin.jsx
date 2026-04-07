@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../../api/axios';
 import { AlertCircle } from 'lucide-react';
 import { validateEmail } from '../../utils/validations';
 
@@ -34,9 +34,9 @@ const FoodPartnerLogin = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/food-partner/login", {
+      const response = await API.post("/api/auth/food-partner/login", {
         email, password
-      }, { withCredentials: true });
+      });
 
       const partnerId = response.data.foodPartner._id;
       localStorage.setItem('role', 'foodPartner');

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import axios from 'axios'
+import API from '../api/axios'
 
 const BottomNav = () => {
   const navigate = useNavigate()
@@ -31,10 +31,10 @@ const BottomNav = () => {
     const fetchUnreadCount = async () => {
       try {
         const endpoint = role === 'foodPartner'
-          ? 'http://localhost:3000/api/messages/partner/unread'
-          : 'http://localhost:3000/api/messages/user/unread';
+          ? '/api/messages/partner/unread'
+          : '/api/messages/user/unread';
         
-        const res = await axios.get(endpoint, { withCredentials: true });
+        const res = await API.get(endpoint);
         setUnreadCount(res.data.unreadCount || 0);
       } catch (error) {
         // Silently fail - user may not be logged in
@@ -52,9 +52,9 @@ const BottomNav = () => {
   const handleLogout = async () => {
     try {
       if (role === 'foodPartner') {
-        await axios.post('http://localhost:3000/api/auth/food-partner/logout', {}, { withCredentials: true })
+        await API.post('/api/auth/food-partner/logout', {})
       } else {
-        await axios.post('http://localhost:3000/api/auth/user/logout', {}, { withCredentials: true })
+        await API.post('/api/auth/user/logout', {})
       }
     } catch (e) {
       console.error('Logout error:', e)

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Send, MessageCircle, Mic, Square, Play, Pause, Trash2, Check, CheckCheck, MoreVertical } from 'lucide-react';
-import axios from 'axios';
+import API from '../../api/axios';
 
 const Messages = () => {
   const { conversationId } = useParams();
@@ -60,9 +60,8 @@ const Messages = () => {
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:3000/api/messages/${conversationId}`,
-        { withCredentials: true }
+      const res = await API.get(
+        `/api/messages/${conversationId}`
       );
       setMessages(res.data.messages);
       setConversation(res.data.conversation);
@@ -80,13 +79,12 @@ const Messages = () => {
     setSending(true);
     try {
       const endpoint = isPartner 
-        ? `http://localhost:3000/api/messages/partner/${conversationId}/send`
-        : `http://localhost:3000/api/messages/user/${conversationId}/send`;
+        ? `/api/messages/partner/${conversationId}/send`
+        : `/api/messages/user/${conversationId}/send`;
 
-      const res = await axios.post(
+      const res = await API.post(
         endpoint,
-        { content: newMessage.trim() },
-        { withCredentials: true }
+        { content: newMessage.trim() }
       );
 
       setMessages(prev => [...prev, res.data.message]);
@@ -158,11 +156,10 @@ const Messages = () => {
       formData.append('duration', recordingTime);
 
       const endpoint = isPartner
-        ? `http://localhost:3000/api/messages/partner/${conversationId}/voice`
-        : `http://localhost:3000/api/messages/user/${conversationId}/voice`;
+        ? `/api/messages/partner/${conversationId}/voice`
+        : `/api/messages/user/${conversationId}/voice`;
 
-      const res = await axios.post(endpoint, formData, {
-        withCredentials: true,
+      const res = await API.post(endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -227,9 +224,8 @@ const Messages = () => {
   // Delete message
   const deleteMessage = async (messageId) => {
     try {
-      await axios.delete(
-        `http://localhost:3000/api/messages/message/${messageId}`,
-        { withCredentials: true }
+      await API.delete(
+        `/api/messages/message/${messageId}`
       );
       setMessages(prev => prev.filter(m => m._id !== messageId));
       setSelectedMessage(null);
@@ -241,9 +237,8 @@ const Messages = () => {
   // Delete entire conversation
   const deleteConversation = async () => {
     try {
-      await axios.delete(
-        `http://localhost:3000/api/messages/conversation/${conversationId}`,
-        { withCredentials: true }
+      await API.delete(
+        `/api/messages/conversation/${conversationId}`
       );
       // Navigate back to conversations list
       navigate(-1);
