@@ -233,8 +233,9 @@ const sendVoiceAsUser = async (req, res) => {
         // Get file extension from original name or default to webm
         const ext = req.file.originalname?.split('.').pop() || 'webm';
         
-        // Upload voice to Cloudinary as audio (returns direct URL string)
-        const voiceUrl = await storageService.uploadFile(req.file.buffer, `voice_${uuid()}.${ext}`, 'audio');
+        // Upload voice to Cloudinary as audio
+        const uploadResult = await storageService.uploadFile(req.file.buffer, `voice_${uuid()}.${ext}`, 'audio');
+        const voiceUrl = uploadResult.url;
 
         const message = await Message.create({
             conversation: conversationId,
@@ -278,8 +279,9 @@ const sendVoiceAsPartner = async (req, res) => {
         // Get file extension from original name or default to webm
         const ext = req.file.originalname?.split('.').pop() || 'webm';
         
-        // Upload voice to Cloudinary as audio (returns direct URL string)
-        const voiceUrl = await storageService.uploadFile(req.file.buffer, `voice_${uuid()}.${ext}`, 'audio');
+        // Upload voice to Cloudinary as audio
+        const uploadResult = await storageService.uploadFile(req.file.buffer, `voice_${uuid()}.${ext}`, 'audio');
+        const voiceUrl = uploadResult.url;
 
         const message = await Message.create({
             conversation: conversationId,

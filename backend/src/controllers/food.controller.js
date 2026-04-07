@@ -18,9 +18,9 @@ async function createFood(req, res) {
         
         const fileUploadResult = await storageService.uploadFile(req.file.buffer, fileName);
         
-        console.log("Upload successful, URL:", fileUploadResult);
+        console.log("Upload successful, URL:", fileUploadResult.url);
         
-        if (!fileUploadResult) {
+        if (!fileUploadResult || !fileUploadResult.url) {
             throw new Error("File upload returned empty result");
         }
 
@@ -28,7 +28,7 @@ async function createFood(req, res) {
             name: req.body.name,
             description: req.body.description,
             price: parseFloat(req.body.price) || 0,
-            video: fileUploadResult,
+            video: fileUploadResult.url,
             foodPartner: req.foodPartner._id
         });
 
