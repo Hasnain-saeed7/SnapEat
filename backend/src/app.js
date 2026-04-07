@@ -7,6 +7,7 @@ const foodPartnerRoutes = require('./routes/food-partner.routes');
 const orderRoutes = require('./routes/order.routes');
 const messageRoutes = require('./routes/message.routes');
 const cors = require('cors');
+const connectDB = require('./db/db');
 
 const app = express();
 app.use(cors({
@@ -15,6 +16,16 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+
+// Ensure DB is connected before handling any request
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        res.status(500).json({ message: 'Database connection failed' });
+    }
+});
 
 app.get("/", (req, res) => {
     res.send("Hello World");
