@@ -10,10 +10,23 @@ const cors = require('cors');
 const connectDB = require('./db/db');
 
 const app = express();
+const allowedOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:5173",
+    "http://localhost:4173",
+    "http://localhost:3000",
+    "http://192.168.100.98:4173",  // Add this
+    "http://192.168.100.98:5173"   // Add this
+];
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS not allowed'));
+        }
+    },
     credentials: true
-}));
+})); 
 app.use(cookieParser());
 app.use(express.json());
 
