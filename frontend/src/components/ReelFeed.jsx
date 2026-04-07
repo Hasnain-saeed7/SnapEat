@@ -494,6 +494,7 @@ const ReelFeed = ({ items = [], onLike, onSave, onCommentAdded, onCommentDeleted
   const [commentsCache, setCommentsCache] = useState({})
   const [commentText, setCommentText] = useState('')
   const [loadingComments, setLoadingComments] = useState(false)
+  const [posting, setPosting] = useState(false)
   const [soundOn, setSoundOn] = useState(false)
   const inputRef = useRef(null)
 
@@ -523,16 +524,46 @@ const ReelFeed = ({ items = [], onLike, onSave, onCommentAdded, onCommentDeleted
     videoRefs.current.set(id, el)
   }
 
-  // ── Comments logic remains same ──
+  // ── Comments logic ──
   const openComments = async (foodId) => {
     setActiveFood(foodId)
+    setCommentText('')
     setLoadingComments(true)
     try {
       const res = await API.get(`/api/food/comments?foodId=${foodId}`)
       setCommentsCache(prev => ({ ...prev, [foodId]: res.data.comments || [] }))
     } catch (e) { console.error(e) }
     finally { setLoadingComments(false) }
+    setTimeout(() => inputRef.current?.focus(), 300)
   }
+
+  const closeComments = () => {
+    setActiveFood(null)
+    setCommentText('')
+  }
+
+  const postComment = async () => {
+    if (!commentText.trim() || posting) return
+    setPosting(true)
+    try {
+      const res = await API.post('/api/food/comment', {
+        foodId: activeFood,
+        comment: commentText.trim()
+      })
+      setCommentsCache(prev => ({
+        ...prev,
+        [activeFood]: [...(prev[activeFood] || []), res.data.comment]
+      }))
+      setCommentText('')
+      if (onCommentAdded) onCommentAdded(activeFood)
+    } catch (e) {
+      console.error('Failed to post comment', e)
+    } finally {
+      setPosting(false)
+    }
+  }
+
+  const currentComments = activeFood ? (commentsCache[activeFood] || []) : []
 
   return (
     <div className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide md:flex md:justify-center" style={{ scrollSnapType: 'y mandatory' }}>
@@ -584,6 +615,7 @@ const ReelFeed = ({ items = [], onLike, onSave, onCommentAdded, onCommentDeleted
                 <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/10">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" /></svg>
                 </div>
+                <span className="text-white text-xs font-semibold">{item.savesCount ?? 0}</span>
               </button>
             </div>
 
@@ -616,6 +648,78 @@ const ReelFeed = ({ items = [], onLike, onSave, onCommentAdded, onCommentDeleted
           </div>
         ))}
       </div>
+
+      {/* Comments Sheet */}
+      {activeFood && (
+        <div 
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end"
+          onClick={(e) => { if (e.target === e.currentTarget) closeComments(); }}
+        >
+          <div className="w-full max-w-lg mx-auto bg-[#1a1a1a] rounded-t-2xl border-t border-white/10 max-h-[75vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+              <span className="text-white font-bold text-base">Comments</span>
+              <button
+                onClick={closeComments}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Comments list */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0a0a0a]">
+              {loadingComments ? (
+                <p className="text-white/50 text-center py-8">Loading...</p>
+              ) : currentComments.length === 0 ? (
+                <p className="text-white/50 text-center py-8">No comments yet. Be the first! 👇</p>
+              ) : (
+                currentComments.map((c, i) => (
+                  <div key={c._id ?? i} className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#E23744]/20 border border-[#E23744]/30 flex items-center justify-center text-[#E23744] text-xs font-bold flex-shrink-0">
+                      {c.user?.profilePic ? (
+                        <img src={c.user.profilePic} alt="" className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        (c.user?.fullName?.[0] ?? 'U').toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-white/50 text-xs font-semibold block">{c.user?.fullName || 'User'}</span>
+                      <span className="text-white text-sm">{c.text}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="flex gap-3 p-4 border-t border-white/10 bg-[#1a1a1a]">
+              <input
+                ref={inputRef}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && postComment()}
+                placeholder="Add a comment..."
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 outline-none focus:border-[#E23744]"
+              />
+              <button
+                onClick={postComment}
+                disabled={!commentText.trim() || posting}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
+                  commentText.trim() ? 'bg-[#E23744]' : 'bg-white/10'
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={commentText.trim() ? 'white' : 'rgba(255,255,255,0.3)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 2 11 13M22 2 15 22l-4-9-9-4 20-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
     </div>
   )
